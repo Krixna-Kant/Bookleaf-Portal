@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 *.pem
+.cursor/mcp.json
 
 # Python
 backend/.venv/

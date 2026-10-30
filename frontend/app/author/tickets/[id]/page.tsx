@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { CategoryBadge, PriorityBadge, StatusBadge } from "@/components/Badges";
@@ -23,29 +24,35 @@ export default function AuthorTicketPage() {
   }, [load]);
   useLiveRefresh(load);
 
-  if (error) return <p className="text-sm text-red-700">{error}</p>;
-  if (!ticket) return <p className="text-sm text-stone-500">Loading ticket…</p>;
+  if (error) return <p className="font-serif text-sm text-[#9e3924]">{error}</p>;
+  if (!ticket) return <p className="font-hand text-3xl">Finding the folio…</p>;
 
   return (
-    <div className="max-w-3xl">
-      <p className="text-xs text-stone-500">{ticket.ticket_number}</p>
-      <h1 className="mt-1 text-2xl font-semibold">{ticket.subject}</h1>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <StatusBadge status={ticket.status} />
-        <PriorityBadge priority={ticket.priority} />
-        <CategoryBadge category={ticket.category} />
-      </div>
-      <p className="mt-3 text-sm text-stone-600">{ticket.book?.title || "General / account level"}</p>
-      <section className="mt-6 space-y-3">
+    <div className="mx-auto max-w-3xl">
+      <Link className="font-hand text-2xl" href="/author/tickets">
+        ← All tickets
+      </Link>
+      <article className="sketch-card mt-4 p-6">
+        <p className="font-note text-xs font-bold">{ticket.ticket_number}</p>
+        <h1 className="font-serif mt-2 text-3xl">{ticket.subject}</h1>
+        <p className="font-hand mt-1 text-2xl text-[#825c18]">{ticket.book?.title || "General / account level"}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <StatusBadge sketch status={ticket.status} />
+          <PriorityBadge sketch priority={ticket.priority} />
+          <CategoryBadge sketch category={ticket.category} />
+        </div>
+      </article>
+      <section className="mt-5 space-y-4">
         {ticket.messages.map((message) => (
-          <article key={message.id} className="rounded-2xl border border-stone-200 bg-white p-4">
-            <p className="text-xs text-stone-500">
+          <article key={message.id} className={`rounded-lg border-2 border-[#2b2a27] p-5 ${message.sender_role === "admin" ? "border-l-8 border-l-[#2d5a27] bg-[#f6f3ea]" : "bg-[#fffdf8]"}`}>
+            <p className="font-note text-[11px] uppercase tracking-wider text-[#545148]">
               {message.sender_name} · {message.sender_role} · {when(message.created_at)}
             </p>
-            <p className="mt-2 whitespace-pre-wrap text-sm">{message.body}</p>
+            <p className="font-serif mt-3 whitespace-pre-wrap text-sm leading-6">{message.body}</p>
           </article>
         ))}
       </section>
+      <p className="font-serif mt-6 text-sm italic text-[#545148]">This folio is read-only. The operations desk writes the replies.</p>
     </div>
   );
 }

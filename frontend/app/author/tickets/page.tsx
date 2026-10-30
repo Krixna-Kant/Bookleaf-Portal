@@ -20,32 +20,32 @@ export default function TicketListPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">My tickets</h1>
-          <p className="text-sm text-stone-600">Replies appear here without a refresh.</p>
+          <p className="font-note text-[11px] uppercase tracking-wider text-[#825c18]">Correspondence</p>
+          <h1 className="font-hand text-6xl leading-none">My tickets</h1>
         </div>
-        <Link className="primary inline-block" href="/author/tickets/new">
+        <Link className="sketch-btn" href="/author/tickets/new">
           New query
         </Link>
       </div>
       {tickets === null ? (
-        <p className="mt-6 text-sm text-stone-500">Loading tickets…</p>
+        <p className="font-hand mt-6 text-2xl">Turning the pages…</p>
       ) : tickets.length === 0 ? (
-        <p className="mt-6 text-sm text-stone-500">You have not raised a query yet.</p>
+        <p className="font-serif mt-6 italic text-[#545148]">You have not raised a query yet.</p>
       ) : (
-        <ul className="mt-6 divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+        <ul className="sketch-card mt-6 overflow-hidden">
           {tickets.map((ticket) => (
-            <li key={ticket.id}>
-              <Link className="block px-4 py-4 hover:bg-stone-50" href={`/author/tickets/${ticket.id}`}>
+            <li key={ticket.id} className="border-b border-dashed border-[#d6d0c2] last:border-0">
+              <Link className="block px-4 py-4 hover:bg-[#fffdf7]" href={`/author/tickets/${ticket.id}`}>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-stone-500">{ticket.ticket_number}</span>
-                  <StatusBadge status={ticket.status} />
-                  <PriorityBadge priority={ticket.priority} />
-                  <CategoryBadge category={ticket.category} />
+                  <span className="font-note text-xs font-bold">{ticket.ticket_number}</span>
+                  <StatusBadge sketch status={ticket.status} />
+                  <PriorityBadge sketch priority={ticket.priority} />
+                  <CategoryBadge sketch category={ticket.category} />
                 </div>
-                <p className="mt-2 font-medium">{ticket.subject}</p>
-                <p className="text-sm text-stone-500">
+                <p className="font-serif mt-2">{ticket.subject}</p>
+                <p className="font-note text-[11px] text-[#545148]">
                   {ticket.book_title || "General / account"} · {when(ticket.updated_at)}
                 </p>
               </Link>

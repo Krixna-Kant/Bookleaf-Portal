@@ -32,7 +32,7 @@ class GroqProvider(LLMProvider):
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {self.api_key}"},
             json={
-                "model": "llama-3.3-70b-versatile",
+                "model": "openai/gpt-oss-120b",
                 "temperature": 0.2,
                 "max_tokens": 500,
                 "messages": [
@@ -45,7 +45,7 @@ class GroqProvider(LLMProvider):
         if response.status_code == 429:
             raise LLMError("Groq rate-limited the request")
         if response.status_code >= 400:
-            raise LLMError(f"Groq error {response.status_code}")
+            raise LLMError(f"Groq error {response.status_code}: {response.text[:240]}")
         data = response.json()
         return data["choices"][0]["message"]["content"].strip()
 

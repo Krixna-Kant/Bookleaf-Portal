@@ -42,13 +42,14 @@ export default function NewTicketPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Raise a query</h1>
-      <p className="mt-1 text-sm text-stone-600">Tell us which book this is about, or choose a general account question.</p>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4 rounded-2xl border border-stone-200 bg-white p-5">
-        <label className="block text-sm">
+    <div className="mx-auto max-w-2xl">
+      <p className="font-note text-[11px] uppercase tracking-wider text-[#825c18]">Author support docket</p>
+      <h1 className="font-hand text-6xl leading-none">Raise a query</h1>
+      <p className="font-serif mt-2 italic text-[#545148]">Tell the desk which book this is about, or leave it as a general account question.</p>
+      <form className="sketch-card mt-6 space-y-4 p-6" onSubmit={onSubmit}>
+        <label className="block font-note text-[11px] font-bold uppercase">
           Book
-          <select className="mt-1" value={bookId} onChange={(event) => setBookId(event.target.value)}>
+          <select className="sketch-input mt-1" value={bookId} onChange={(event) => setBookId(event.target.value)}>
             <option value="">General / account level</option>
             {books.map((book) => (
               <option key={book.id} value={book.id}>
@@ -57,30 +58,25 @@ export default function NewTicketPage() {
             ))}
           </select>
         </label>
-        <label className="block text-sm">
+        <label className="block font-note text-[11px] font-bold uppercase">
           Subject
-          <input className="mt-1" value={subject} onChange={(event) => setSubject(event.target.value)} minLength={3} required />
+          <input className="sketch-input mt-1" value={subject} minLength={3} onChange={(event) => setSubject(event.target.value)} required />
         </label>
-        <label className="block text-sm">
+        <label className="block font-note text-[11px] font-bold uppercase">
           Description
-          <textarea className="mt-1 min-h-32" value={description} onChange={(event) => setDescription(event.target.value)} minLength={10} required />
+          <textarea className="sketch-input mt-1 min-h-36" value={description} minLength={10} onChange={(event) => setDescription(event.target.value)} required />
         </label>
-        <label className="block text-sm">
+        <label className="block font-note text-[11px] font-bold uppercase">
           Attachments
-          <input
-            className="mt-1"
-            type="file"
-            multiple
-            onChange={(event) => setFiles(Array.from(event.target.files || []).map((file) => file.name))}
-          />
-          <span className="mt-1 block text-xs text-stone-500">
+          <input className="sketch-input mt-1" type="file" multiple onChange={(event) => setFiles(Array.from(event.target.files || []).map((file) => file.name))} />
+          <span className="font-serif mt-1 block text-sm italic text-[#545148]">
             File names are noted with the query. Upload storage is not enabled yet.
             {files.length ? ` Selected: ${files.join(", ")}` : ""}
           </span>
         </label>
-        {error ? <p className="text-sm text-red-700">{error}</p> : null}
-        <button className="primary" disabled={pending} type="submit">
-          {pending ? "Submitting…" : "Submit query"}
+        {error ? <p className="font-serif text-sm text-[#9e3924]">{error}</p> : null}
+        <button className="sketch-btn sketch-btn-ink" disabled={pending} type="submit">
+          {pending ? "Sending…" : "Submit query"}
         </button>
       </form>
     </div>

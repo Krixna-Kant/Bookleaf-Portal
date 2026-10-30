@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CategoryBadge, PriorityBadge, StatusBadge } from "@/components/Badges";
@@ -70,136 +71,154 @@ export default function AdminTicketPage() {
     setNote("");
   }
 
-  if (error && !ticket) return <p className="text-sm text-red-700">{error}</p>;
-  if (!ticket) return <p className="text-sm text-stone-500">Loading ticket…</p>;
+  if (error && !ticket) return <p className="text-sm text-[#93000a]">{error}</p>;
+  if (!ticket) return <p className="text-sm text-[#737970]">Opening the dossier…</p>;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
-      <section>
-        <p className="text-xs text-stone-500">{ticket.ticket_number}</p>
-        <h1 className="mt-1 text-2xl font-semibold">{ticket.subject}</h1>
-        <p className="mt-2 text-sm text-stone-600">
-          {ticket.author_name} · {ticket.book_title || "General / account"} · opened {when(ticket.created_at)}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <StatusBadge status={ticket.status} />
-          <PriorityBadge priority={ticket.priority} />
-          <CategoryBadge category={ticket.category} />
-          <span className="text-xs text-stone-500">
-            labels from {ticket.category_source}/{ticket.priority_source}
-          </span>
-        </div>
-        {ticket.book ? (
-          <p className="mt-3 text-sm text-stone-700">
-            {ticket.book.status} · sold {ticket.book.total_copies_sold} · pending {inr(ticket.book.royalty_pending)} · last payout{" "}
-            {ticket.book.last_royalty_payout_date || "never"}
-          </p>
-        ) : null}
-        <div className="mt-5 space-y-3">
-          {ticket.messages.map((message) => (
-            <article key={message.id} className="rounded-2xl border border-stone-200 bg-white p-4">
-              <p className="text-xs text-stone-500">
-                {message.sender_name} · {message.sender_role} · {when(message.created_at)}
-              </p>
-              <p className="mt-2 whitespace-pre-wrap text-sm">{message.body}</p>
+    <div>
+      <Link className="text-sm text-[#424840] hover:text-[#07290c]" href="/admin">
+        ← Back to the queue
+      </Link>
+      <div className="mt-4 grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
+        <section className="space-y-4">
+          <article className="ops-card p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#737970]">{ticket.ticket_number}</p>
+            <h1 className="font-display mt-2 text-3xl text-[#07290c]">{ticket.subject}</h1>
+            <p className="mt-2 text-sm text-[#424840]">
+              {ticket.author_name} · {ticket.book_title || "General / account"} · opened {when(ticket.created_at)}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <StatusBadge status={ticket.status} />
+              <PriorityBadge priority={ticket.priority} />
+              <CategoryBadge category={ticket.category} />
+              <span className="text-xs text-[#737970]">
+                labels from {ticket.category_source}/{ticket.priority_source}
+              </span>
+            </div>
+          </article>
+          {ticket.book ? (
+            <article className="grid gap-3 rounded-2xl bg-[#f0edea] p-5 sm:grid-cols-4">
+              <Fact label="Status" value={ticket.book.status} />
+              <Fact label="Copies sold" value={String(ticket.book.total_copies_sold)} />
+              <Fact label="Royalty pending" value={inr(ticket.book.royalty_pending)} />
+              <Fact label="Last payout" value={ticket.book.last_royalty_payout_date || "Never"} />
             </article>
-          ))}
-        </div>
-        <form onSubmit={sendReply} className="mt-5 space-y-3 rounded-2xl border border-stone-200 bg-white p-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-medium">Reply</h2>
-            <span className="text-xs text-stone-500">Draft: {ticket.ai_draft_status}</span>
-          </div>
-          {ticket.ai_draft_status === "failed" ? (
-            <p className="text-sm text-amber-800">The model did not return a draft. Write the reply yourself.</p>
           ) : null}
-          {ticket.ai_rationale ? <p className="text-xs text-stone-500">Why this label: {ticket.ai_rationale}</p> : null}
-          <textarea id="draft" className="min-h-40" value={draft} onChange={(event) => setDraft(event.target.value)} />
-          <div className="flex gap-2">
-            <button className="primary" disabled={pending} type="submit">
-              {pending ? "Sending…" : "Send to author"}
-            </button>
-            <button
-              className="secondary"
-              type="button"
-              onClick={async () => {
-                await api(`/api/v1/admin/tickets/${params.id}/ai/regenerate-draft`, { method: "POST" });
-                load();
-              }}
-            >
-              Regenerate draft
-            </button>
-          </div>
-          {error ? <p className="text-sm text-red-700">{error}</p> : null}
-        </form>
-      </section>
-      <aside className="space-y-4">
-        <section className="rounded-2xl border border-stone-200 bg-white p-4 space-y-3">
-          <h2 className="font-medium">Manage</h2>
-          <label className="block text-sm">
-            Status
-            <select className="mt-1" value={ticket.status} onChange={(event) => patch({ status: event.target.value })}>
-              {Object.entries(STATUS_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            Category
-            <select className="mt-1" value={ticket.category} onChange={(event) => patch({ category: event.target.value })}>
-              {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            Priority
-            <select className="mt-1" value={ticket.priority} onChange={(event) => patch({ priority: event.target.value })}>
-              {Object.entries(PRIORITY_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            className="secondary w-full"
-            type="button"
-            disabled={!me}
-            onClick={async () => {
-              if (!me) return;
-              const updated = await api<TicketDetail>(`/api/v1/admin/tickets/${params.id}/assign`, { method: "POST" });
-              setTicket(updated);
-            }}
-          >
-            {ticket.assigned_to_id === me?.id ? "Assigned to you" : "Assign to me"}
-          </button>
-        </section>
-        <section className="rounded-2xl border border-stone-200 bg-white p-4">
-          <h2 className="font-medium">Internal notes</h2>
-          <p className="text-xs text-stone-500">Visible to ops only.</p>
-          <ul className="mt-3 space-y-2">
-            {ticket.notes.map((item) => (
-              <li key={item.id} className="rounded-lg bg-amber-50 px-3 py-2 text-sm">
-                <span className="block text-xs text-stone-500">
-                  {item.admin_name} · {when(item.created_at)}
-                </span>
-                {item.body}
-              </li>
+          <div className="space-y-3">
+            {ticket.messages.map((message) => (
+              <article key={message.id} className="rounded-2xl bg-[#f6f3ef] p-4">
+                <p className="text-xs text-[#737970]">
+                  {message.sender_name} · {message.sender_role} · {when(message.created_at)}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+              </article>
             ))}
-          </ul>
-          <form onSubmit={addNote} className="mt-3 space-y-2">
-            <textarea className="min-h-20" value={note} onChange={(event) => setNote(event.target.value)} placeholder="Note for the team" />
-            <button className="secondary" type="submit">
-              Add note
-            </button>
+          </div>
+          <form className="ops-card space-y-3 p-5" onSubmit={sendReply}>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl text-[#07290c]">Reply</h2>
+              <span className="rounded-full bg-[#ffdeaa] px-2 py-0.5 text-[11px] font-semibold text-[#271900]">Draft: {ticket.ai_draft_status}</span>
+            </div>
+            {ticket.ai_draft_status === "failed" ? (
+              <p className="text-sm text-[#7d5700]">The model did not return a draft. Write the reply yourself.</p>
+            ) : null}
+            {ticket.ai_rationale ? <p className="text-xs text-[#737970]">Why this label: {ticket.ai_rationale}</p> : null}
+            <textarea id="draft" className="ops-input min-h-40" value={draft} onChange={(event) => setDraft(event.target.value)} />
+            <div className="flex flex-wrap gap-2">
+              <button className="ops-btn" disabled={pending} type="submit">
+                {pending ? "Sending…" : "Send to author"}
+              </button>
+              <button
+                className="ops-btn-quiet"
+                type="button"
+                onClick={async () => {
+                  await api(`/api/v1/admin/tickets/${params.id}/ai/regenerate-draft`, { method: "POST" });
+                  load();
+                }}
+              >
+                Regenerate draft
+              </button>
+            </div>
+            {error ? <p className="text-sm text-[#93000a]">{error}</p> : null}
           </form>
         </section>
-      </aside>
+        <aside className="space-y-4">
+          <section className="ops-card space-y-3 p-5">
+            <h2 className="font-display text-xl text-[#07290c]">Manage</h2>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#737970]">
+              Status
+              <select className="ops-input mt-1" value={ticket.status} onChange={(event) => patch({ status: event.target.value })}>
+                {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#737970]">
+              Category
+              <select className="ops-input mt-1" value={ticket.category} onChange={(event) => patch({ category: event.target.value })}>
+                {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#737970]">
+              Priority
+              <select className="ops-input mt-1" value={ticket.priority} onChange={(event) => patch({ priority: event.target.value })}>
+                {Object.entries(PRIORITY_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="text-sm text-[#424840]">{ticket.assigned_to_name ? `Assigned to ${ticket.assigned_to_name}` : "Unassigned"}</p>
+            <button
+              className="ops-btn-quiet w-full"
+              type="button"
+              disabled={!me || ticket.assigned_to_id === me.id}
+              onClick={async () => {
+                const updated = await api<TicketDetail>(`/api/v1/admin/tickets/${params.id}/assign`, { method: "POST" });
+                setTicket(updated);
+              }}
+            >
+              {ticket.assigned_to_id === me?.id ? "Assigned to you" : "Assign to me"}
+            </button>
+          </section>
+          <section className="rounded-2xl bg-[#f4efe0] p-5">
+            <h2 className="font-display text-xl text-[#07290c]">Internal notes</h2>
+            <p className="text-xs text-[#7d5700]">Visible to ops only.</p>
+            <ul className="mt-3 space-y-2">
+              {ticket.notes.map((item) => (
+                <li key={item.id} className="rounded-lg bg-white px-3 py-2 text-sm">
+                  <span className="block text-xs text-[#737970]">
+                    {item.admin_name} · {when(item.created_at)}
+                  </span>
+                  {item.body}
+                </li>
+              ))}
+            </ul>
+            <form className="mt-3 space-y-2" onSubmit={addNote}>
+              <textarea className="ops-input min-h-20" value={note} onChange={(event) => setNote(event.target.value)} placeholder="Note for the team" />
+              <button className="ops-btn-quiet" type="submit">
+                Add note
+              </button>
+            </form>
+          </section>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-[#737970]">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-[#1c1c1a]">{value}</p>
     </div>
   );
 }

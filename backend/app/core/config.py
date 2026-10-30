@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     ai_provider: str = "groq"
     groq_api_key: str = ""
     gemini_api_key: str = ""
-    ai_timeout_seconds: float = 8.0
+    ai_timeout_seconds: float = 20.0
 
     seed_author_password: str = "Author@123"
     seed_admin_email: str = "ops@bookleaf.com"

@@ -2,41 +2,152 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --paper: #faf6ee;
+  --ink: #2b2a27;
+  --forest: #1e3f20;
+  --gold: #7d5700;
+}
+
 body {
-  color: #1c1917;
-  background: #f6f3ee;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  overflow-x: hidden;
 }
 
-input,
-select,
-textarea {
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+.font-sans-ops {
+  font-family: var(--font-source), "Segoe UI", sans-serif;
+}
+
+.font-hand {
+  font-family: var(--font-caveat), cursive;
+}
+
+.font-note {
+  font-family: var(--font-courier), ui-monospace, monospace;
+}
+
+.font-serif {
+  font-family: var(--font-literata), Georgia, serif;
+}
+
+.paper-dots {
+  background-color: #faf6ee;
+  background-image: radial-gradient(#e0dacf 0.8px, transparent 0.8px);
+  background-size: 18px 18px;
+}
+
+.sketch-card {
+  border: 2px solid #2b2a27;
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  box-shadow: 3px 3px 0 #2b2a27;
+  background: #fffdf8;
+}
+
+.sketch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 2px solid #2b2a27;
+  border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  box-shadow: 2px 2px 0 #2b2a27;
+  background: #fff2b2;
+  color: #2b2a27;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-caveat), cursive;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.sketch-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #2b2a27;
+}
+
+.sketch-btn-ink {
+  background: #2b2a27;
+  color: #faf6ee;
+}
+
+.sketch-input {
   width: 100%;
-  border: 1px solid #d6d3d1;
-  border-radius: 0.5rem;
-  background: white;
+  border: 2px solid #2b2a27;
+  border-radius: 10px 12px 8px 11px;
+  background: #fffdf8;
+  box-shadow: 2px 2px 0 rgba(43, 42, 39, 0.25);
+  padding: 0.6rem 0.75rem;
+  color: #1c1c17;
+  font-family: var(--font-literata), Georgia, serif;
+}
+
+.sketch-input:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 3px 3px 0 #2b2a27;
+}
+
+.crayon-ochre {
+  background: linear-gradient(104deg, rgba(247, 219, 140, 0.95), rgba(254, 236, 183, 0.95));
+}
+
+.crayon-sage {
+  background: linear-gradient(104deg, rgba(206, 230, 203, 0.95), rgba(225, 243, 222, 0.95));
+}
+
+.crayon-peach {
+  background: linear-gradient(104deg, rgba(255, 214, 204, 0.95), rgba(255, 230, 224, 0.95));
+}
+
+.ops-shell {
+  background: #fcf9f5;
+  color: #1c1c1a;
+  font-family: var(--font-source), "Segoe UI", sans-serif;
+}
+
+.ops-card {
+  background: #f6f3ef;
+  border-radius: 0.9rem;
+}
+
+.ops-input {
+  width: 100%;
+  border: 0;
+  border-radius: 0.6rem;
+  background: #f0edea;
   padding: 0.55rem 0.75rem;
-  font-size: 0.95rem;
+  color: #1c1c1a;
+  font-family: var(--font-source), "Segoe UI", sans-serif;
 }
 
-button.primary,
-a.primary {
-  display: inline-block;
-  border-radius: 0.5rem;
-  background: #14532d;
-  color: white;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.95rem;
+.ops-input:focus {
+  outline: 2px solid #1e3f20;
+  background: #fff;
 }
 
-button.primary:disabled {
-  opacity: 0.6;
+.ops-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 0.6rem;
+  background: #1e3f20;
+  color: #fcf9f5;
+  padding: 0.55rem 0.95rem;
+  font-weight: 600;
 }
 
-button.secondary {
-  border-radius: 0.5rem;
-  border: 1px solid #d6d3d1;
-  background: white;
-  padding: 0.55rem 0.9rem;
-  font-size: 0.95rem;
+.ops-btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 0.6rem;
+  background: #f0edea;
+  color: #1c1c1a;
+  padding: 0.55rem 0.95rem;
 }
