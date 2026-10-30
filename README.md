@@ -94,6 +94,16 @@ From `backend`, with the API running:
 .\.venv\Scripts\python.exe scripts\test_realtime.py
 ```
 
+## Free demo hosting
+
+The live pieces are three free accounts, because one free host cannot keep Postgres, a long-running API, and Next.js awake together.
+
+- [Neon](https://neon.tech) for Postgres. The free project sleeps when idle and wakes on the next query. Do not use Render's free database: it is deleted after 30 days.
+- [Render](https://render.com) free web service for the API. `render.yaml` in this repo migrates, seeds, and starts Uvicorn. The free instance sleeps after about 15 minutes and takes about a minute to wake. The portal already polls if the live stream drops during that wake.
+- [Vercel](https://vercel.com) Hobby for the Next.js app. Set the project root to `frontend` and `NEXT_PUBLIC_API_URL` to the Render URL. Then set the API's `CORS_ORIGINS` to the Vercel URL and redeploy the API.
+
+Paste `GROQ_API_KEY` into the Render service. Render generates `JWT_SECRET`. Neither belongs in git.
+
 ## Limits
 
 - Attachment names can be typed with a query. The files are not stored.

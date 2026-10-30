@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,6 +27,15 @@ class Settings(BaseSettings):
     seed_admin_email: str = "ops@bookleaf.com"
     seed_admin_password: str = "Admin@123"
     seed_admin_name: str = "BookLeaf Ops"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def use_psycopg_driver(cls, value: str) -> str:
+        if value.startswith("postgres://"):
+            value = "postgresql://" + value.removeprefix("postgres://")
+        if value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value.removeprefix("postgresql://")
+        return value
 
     @property
     def cors_origin_list(self) -> list[str]:
