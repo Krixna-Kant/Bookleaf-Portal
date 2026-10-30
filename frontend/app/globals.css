@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #1c1917;
+  background: #f6f3ee;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #d6d3d1;
+  border-radius: 0.5rem;
+  background: white;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+button.primary,
+a.primary {
+  display: inline-block;
+  border-radius: 0.5rem;
+  background: #14532d;
+  color: white;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+button.primary:disabled {
+  opacity: 0.6;
+}
+
+button.secondary {
+  border-radius: 0.5rem;
+  border: 1px solid #d6d3d1;
+  background: white;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+}
