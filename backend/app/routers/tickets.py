@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 
+from app.ai.pipeline import run_ai_pipeline
 from app.core.deps import require_author
 from app.core.errors import AppError
 from app.db.models import User
@@ -14,10 +15,12 @@ router = APIRouter(prefix="/api/v1/tickets", tags=["tickets"])
 @router.post("", response_model=TicketDetail, status_code=201)
 def create_author_ticket(
     body: TicketCreate,
+    background: BackgroundTasks,
     user: User = Depends(require_author),
     db: Session = Depends(get_db),
 ) -> TicketDetail:
     ticket = create_ticket(db, user, body.book_id, body.subject, body.description)
+    background.add_task(run_ai_pipeline, ticket.id)
     return ticket_to_detail(ticket, include_notes=False)
 
 

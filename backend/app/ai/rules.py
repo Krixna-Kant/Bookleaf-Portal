@@ -3,7 +3,8 @@ from app.enums import PRIORITY_WEIGHT, TicketCategory, TicketPriority
 _ROYALTY = ("royalty", "payout", "payment", "bank", "₹", "rupee", "threshold")
 _ISBN = ("isbn", "metadata", "imprint", "wrong book")
 _PRINT = ("print", "blurry", "binding", "misprint", "reprint", "quality", "pages", "color")
-_DIST = ("amazon", "flipkart", "unavailable", "out of stock", "listing", "re-sync", "resync")
+_DIST = ("unavailable", "out of stock", "currently unavailable", "re-sync", "resync", "not listed")
+_GENERAL = ("author bio", "update my bio", "book description", "can i update", "bio")
 _STATUS = ("typesetting", "cover design", "production", "proofread", "when will", "timeline", "stage")
 
 
@@ -21,9 +22,14 @@ def classify_ticket(subject: str, description: str) -> tuple[TicketCategory, Tic
     elif any(token in text for token in _PRINT):
         category = TicketCategory.PRINTING_QUALITY
         rationale = "Query mentions print or quality defects."
-    elif any(token in text for token in _DIST):
+    elif any(token in text for token in _DIST) or (
+        ("amazon" in text or "flipkart" in text) and ("stock" in text or "listing" in text)
+    ):
         category = TicketCategory.DISTRIBUTION
         rationale = "Query mentions store listing or availability."
+    elif any(token in text for token in _GENERAL):
+        category = TicketCategory.GENERAL
+        rationale = "Query is a profile or metadata update request."
     elif any(token in text for token in _STATUS):
         category = TicketCategory.BOOK_STATUS
         rationale = "Query mentions production status or timeline."

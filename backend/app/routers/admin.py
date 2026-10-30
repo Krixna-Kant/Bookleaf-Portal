@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.ai.pipeline import run_ai_pipeline
 from app.core.deps import require_admin
+from app.enums import AiDraftStatus
 from app.db.models import User
 from app.db.session import get_db
 from app.enums import TicketCategory, TicketPriority, TicketStatus
@@ -86,6 +88,20 @@ def create_note(
     db: Session = Depends(get_db),
 ) -> TicketDetail:
     return ticket_to_detail(add_note(db, get_ticket(db, ticket_id), user, body.body), include_notes=True)
+
+
+@router.post("/tickets/{ticket_id}/ai/regenerate-draft", response_model=TicketDetail)
+def regenerate_draft(
+    ticket_id: int,
+    background: BackgroundTasks,
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> TicketDetail:
+    ticket = get_ticket(db, ticket_id)
+    ticket.ai_draft_status = AiDraftStatus.PENDING
+    db.commit()
+    background.add_task(run_ai_pipeline, ticket.id)
+    return ticket_to_detail(get_ticket(db, ticket.id), include_notes=True)
 
 
 @router.post("/tickets/{ticket_id}/replies", response_model=TicketDetail)
