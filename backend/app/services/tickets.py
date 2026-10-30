@@ -19,6 +19,7 @@ from app.enums import (
 from app.schemas.auth import UserOut
 from app.schemas.books import BookOut
 from app.schemas.tickets import MessageOut, NoteOut, TicketDetail, TicketSummary
+from app.services.realtime import publish_ticket_event
 
 
 def next_ticket_number(db: Session) -> str:
@@ -177,7 +178,9 @@ def create_ticket(db: Session, author: User, book_id: int | None, subject: str, 
     )
     db.commit()
     db.expire_all()
-    return get_ticket(db, ticket.id)
+    loaded = get_ticket(db, ticket.id)
+    publish_ticket_event("ticket.created", loaded.id, loaded.author_id)
+    return loaded
 
 
 def list_author_tickets(db: Session, author_id: int) -> list[Ticket]:
@@ -275,7 +278,9 @@ def patch_ticket(
         )
     db.commit()
     db.expire_all()
-    return get_ticket(db, ticket.id)
+    loaded = get_ticket(db, ticket.id)
+    publish_ticket_event("ticket.updated", loaded.id, loaded.author_id)
+    return loaded
 
 
 def assign_to_self(db: Session, ticket: Ticket, admin: User) -> Ticket:
@@ -292,7 +297,9 @@ def assign_to_self(db: Session, ticket: Ticket, admin: User) -> Ticket:
     )
     db.commit()
     db.expire_all()
-    return get_ticket(db, ticket.id)
+    loaded = get_ticket(db, ticket.id)
+    publish_ticket_event("ticket.updated", loaded.id, loaded.author_id)
+    return loaded
 
 
 def add_note(db: Session, ticket: Ticket, admin: User, body: str) -> Ticket:
@@ -307,7 +314,9 @@ def add_note(db: Session, ticket: Ticket, admin: User, body: str) -> Ticket:
     )
     db.commit()
     db.expire_all()
-    return get_ticket(db, ticket.id)
+    loaded = get_ticket(db, ticket.id)
+    publish_ticket_event("ticket.updated", loaded.id, loaded.author_id)
+    return loaded
 
 
 def add_reply(db: Session, ticket: Ticket, admin: User, body: str) -> Ticket:
@@ -328,7 +337,9 @@ def add_reply(db: Session, ticket: Ticket, admin: User, body: str) -> Ticket:
     )
     db.commit()
     db.expire_all()
-    return get_ticket(db, ticket.id)
+    loaded = get_ticket(db, ticket.id)
+    publish_ticket_event("ticket.message", loaded.id, loaded.author_id)
+    return loaded
 
 
 def admin_stats(db: Session) -> dict:
