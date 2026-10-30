@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.core.errors import register_exception_handlers
+from app.routers import auth as auth_router
 
 settings = get_settings()
 
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 register_exception_handlers(app)
+app.include_router(auth_router.router)
 
 
 @app.get("/health", tags=["system"])
